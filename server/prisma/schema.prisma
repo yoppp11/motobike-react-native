@@ -11,62 +11,23 @@ datasource db {
   provider = "postgresql"
 }
 
-model Product {
-  id          String   @unique @default(uuid())
-  name        String
-  description String
-  price       Int
-  categoryId  String
-  ratingId    String
-  imageId     String
-  createdAt   DateTime @default(now())
-
-  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  rating   Rating   @relation(fields: [ratingId], references: [id], onDelete: Cascade)
-  image    Image    @relation(fields: [imageId], references: [id], onDelete: Cascade)
-
-  @@map("products")
-}
-
-model Category {
-  id   String @unique @default(uuid())
-  name String
-
-  products Product[]
-
-  @@map("categories")
-}
-
-model Rating {
-  id        String   @unique @default(uuid())
-  rate      Int
-  comment   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime
-
-  products Product[]
-
-  @@map("ratings")
-}
-
-model Image {
-  id String @unique @default(uuid())
-
-  products Product[]
-
-  @@map("images")
-}
-
 model User {
-  id            String    @id
+  id            String   @id
   name          String
   email         String
-  emailVerified Boolean   @default(false)
+  emailVerified Boolean  @default(false)
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  sessions      Session[]
-  accounts      Account[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  sessions         Session[]
+  accounts         Account[]
+  customers        Customer[]
+  customerServices CustomerService[]
+  userRoles        UserRole[]
+  orders           Order[]
+  messages         Message[]
+  reviews          Review[]
 
   @@unique([email])
   @@map("user")
@@ -118,4 +79,158 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+model Customer {
+  id     String @id @unique @default(uuid())
+  name   String
+  userId String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  conversations Conversation[]
+
+  @@map("customers")
+}
+
+model CustomerService {
+  id     String @id @unique @default(uuid())
+  name   String
+  userId String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  conversations Conversation[]
+
+  @@map("customerServices")
+}
+
+model Role {
+  id   String @id @unique @default(uuid())
+  name String
+
+  userRole UserRole[]
+
+  @@map("roles")
+}
+
+model UserRole {
+  id     String @id @unique @default(uuid())
+  userId String
+  roleId String
+
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("userRoles")
+}
+
+model Product {
+  id          String   @id @unique @default(uuid())
+  name        String
+  description String
+  price       Int
+  categoryId  String
+  imageId     String
+  ratingAvg   Int
+  ratingCount Int
+  createdAt   DateTime @default(now())
+
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  image    Image    @relation(fields: [imageId], references: [id], onDelete: Cascade)
+
+  reviews Review[]
+  orders  Order[]
+
+  @@map("products")
+}
+
+model Category {
+  id   String @id @unique @default(uuid())
+  name String
+
+  products Product[]
+
+  @@map("categories")
+}
+
+model Order {
+  id           String   @id @unique @default(uuid())
+  productId    String
+  userId       String
+  rentalPeriod DateTime
+  price        Int
+  totalPrice   Int
+  discount     Int
+  name         String
+  createdAt    DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  reviews Review[]
+
+  @@map("orders")
+}
+
+model Review {
+  id         String   @id @unique @default(uuid())
+  rating     Int
+  reviewText String
+  productId  String
+  userId     String
+  orderId    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("reviews")
+}
+
+model Conversation {
+  id            String   @id @unique @default(uuid())
+  lastMessage   String
+  customerId    String
+  csId          String
+  lastMessageAt DateTime
+  createdAt     DateTime @default(now())
+
+  customer Customer        @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  cs       CustomerService @relation(fields: [csId], references: [id], onDelete: Cascade)
+
+  messages Message[]
+
+  @@map("conversations")
+}
+
+model Message {
+  id             String     @id @unique @default(uuid())
+  conversationId String
+  senderId       String
+  senderType     SenderType
+  messageText    String
+  messageType    String
+  isRead         Boolean    @default(false)
+  createdAt      DateTime   @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+model Image {
+  id String @id @unique @default(uuid())
+
+  products Product[]
+
+  @@map("images")
+}
+
+enum SenderType {
+  customer
+  cs
 }
