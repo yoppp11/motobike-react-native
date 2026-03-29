@@ -6,8 +6,18 @@ export const ProductsSchema = z.object({
     description: z.string(),
     price: z.int().positive(),
     categoryId: z.string().uuid(),
-    ratingId: z.string().uuid(),
+    ratingCount: z.int(),
+    ratingAvg: z.int(),
     imageId: z.string().uuid(),
+    createdAt: z.date()
 })
 
-export type Products = z.infer<typeof ProductsSchema>
+export const CreateProductSchema = ProductsSchema.omit({
+    id: true,
+    ratingCount: true,
+    ratingAvg: true,
+    createdAt: true
+})
+
+export type Product = z.infer<typeof ProductsSchema>
+export type CreateProduct = z.infer<typeof CreateProductSchema>
