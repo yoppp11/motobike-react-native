@@ -1,4 +1,5 @@
 import { CreateCategory, CreateCategorySchema } from "@/dto/category.dto"
+import { requireAuth } from "@/middlewares/auth-middleware"
 import { CategoryService } from "@/services/categories"
 import { Request, Response, Router } from "express"
 
@@ -8,6 +9,7 @@ const service = new CategoryService()
 categoryRouter.post('/', async (req: Request, res: Response, next) => {
     try {
         const body: CreateCategory = req.body
+        console.log(req)
 
         const createCategory = CreateCategorySchema.parse(body)
 
