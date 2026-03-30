@@ -5,9 +5,9 @@ export const CategorySchema = z.object({
     name: z.string().min(4)
 })
 
-export const CreateCategorySchema = CategorySchema.omit({
+export const RequestCategorySchema = CategorySchema.omit({
     id: true
 })
 
 export type Category = z.infer<typeof CategorySchema>
-export type CreateCategory = z.infer<typeof CreateCategorySchema>
+export type RequestCategory = z.infer<typeof RequestCategorySchema>
