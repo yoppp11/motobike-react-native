@@ -9,6 +9,7 @@ import productRouter from "./routes/products"
 import { errorMiddleware } from "./middlewares/error-middleware"
 import categoryRouter from "./routes/categories"
 import { requireAuth } from "./middlewares/auth-middleware"
+import authRouter from "./routes/auth"
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -17,6 +18,7 @@ app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
+app.use("/api", authRouter)
 app.use("/api/auth", toNodeHandler(auth))
 app.use(requireAuth)
 app.use("/api/products", productRouter)

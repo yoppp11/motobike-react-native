@@ -22,3 +22,15 @@ export async function requireAuth(req: AuthRequest, res: Response, next: NextFun
         next(error)
     }
 }
+
+// export async function requireRole(...roles: string[]) {
+//     return (req: AuthRequest, res: Response, next: NextFunction) => {
+//         try {
+//             if(!req.user) throw new UnauthorizedError('Authentication required')
+            
+//             if(!roles.includes(req.user.role))
+//         } catch (error) {
+//             next(error)
+//         }
+//     }
+// }

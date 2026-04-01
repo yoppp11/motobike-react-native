@@ -107,7 +107,7 @@ model CustomerService {
 
 model Role {
   id   String @id @unique @default(uuid())
-  name String
+  name String @unique
 
   userRole UserRole[]
 
